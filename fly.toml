@@ -1,52 +1,73 @@
-app = "postgres-ha-example"
+# fly.toml app configuration file generated for blazed-deals-db on 2024-10-30T15:42:43-05:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-kill_signal = "SIGTERM"
-kill_timeout = 300
-services = []
-
-[checks]
-
-  [checks.pg]
-    grace_period = "30s"
-    interval = "15s"
-    method = "get"
-    path = "/flycheck/pg"
-    port = 5500
-    timeout = "10s"
-    type = "http"
-
-  [checks.role]
-    grace_period = "30s"
-    interval = "15s"
-    method = "get"
-    path = "/flycheck/role"
-    port = 5500
-    timeout = "10s"
-    type = "http"
-
-  [checks.vm]
-    grace_period = "1s"
-    interval = "1m"
-    method = "get"
-    path = "/flycheck/vm"
-    port = 5500
-    timeout = "10s"
-    type = "http"
+app = 'blazed-deals-db'
+primary_region = 'iad'
 
 [env]
-  BACKEND_STORE = "consul"
-  PRIMARY_REGION = "ord"
-
-[experimental]
-  allowed_public_ports = []
-  auto_rollback = false
-  enable_consul = true
-  private_network = true
-
-[metrics]
-  path = "/metrics"
-  port = 9187
+  PRIMARY_REGION = 'iad'
 
 [[mounts]]
-  destination = "/data"
-  source = "pg_data"
+  source = 'pg_data'
+  destination = '/data'
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 5432
+  auto_start_machines = false
+
+  [[services.ports]]
+    port = 5432
+    handlers = ['pg_tls']
+
+  [services.concurrency]
+    type = 'connections'
+    hard_limit = 1000
+    soft_limit = 1000
+
+[[services]]
+  protocol = 'tcp'
+  internal_port = 5433
+  auto_start_machines = false
+
+  [[services.ports]]
+    port = 5433
+    handlers = ['pg_tls']
+
+  [services.concurrency]
+    type = 'connections'
+    hard_limit = 1000
+    soft_limit = 1000
+
+[checks]
+  [checks.pg]
+    port = 5500
+    type = 'http'
+    interval = '15s'
+    timeout = '10s'
+    path = '/flycheck/pg'
+
+  [checks.role]
+    port = 5500
+    type = 'http'
+    interval = '15s'
+    timeout = '10s'
+    path = '/flycheck/role'
+
+  [checks.vm]
+    port = 5500
+    type = 'http'
+    interval = '15s'
+    timeout = '10s'
+    path = '/flycheck/vm'
+
+[[metrics]]
+  port = 9187
+  path = '/metrics'
+  https = false
+  
+[[vm]]
+  size = 'shared-cpu-4x'
+  memory = '8gb'

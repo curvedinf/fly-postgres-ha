@@ -41,6 +41,7 @@ RUN echo "deb https://packagecloud.io/timescale/timescaledb/debian/ $(cat /etc/o
 RUN apt-get update && apt-get install --no-install-recommends -y \
     postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR \
     postgresql-$PG_MAJOR-postgis-$POSTGIS_MAJOR-scripts \
+    postgresql-$PG_MAJOR-pgvector \
     timescaledb-2-postgresql-$PG_MAJOR \
     && apt autoremove -y \
     && echo 'Installing wal-g' \
